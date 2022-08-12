@@ -1,0 +1,23 @@
+{
+    "name": "zhensoft/lizengbang",
+    "description": "礼赠帮短信php的sdk",
+    "homepage": "http://www.wlphp.com",
+    "type": "library",
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "lizengbang\\": "src/tools"
+        }
+    },
+    "authors": [
+        {
+            "name": "王磊",
+            "email": "613154514@qq.com",
+            "homepage": "http://www.wlphp.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
