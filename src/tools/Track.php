@@ -9,7 +9,9 @@
 // | Author: wl < 613154514@qq.com >
 // +----------------------------------------------------------------------
 namespace lizengbang;
-class Sms
+use think\Request;
+
+class Track
 {
     public $api_url;
     public $appid;
@@ -27,18 +29,16 @@ class Sms
         echo "test 执行了";
     }
 
-    //发送短信方法
-    public function sendsms($destnumbers, $msg, $type='0')
+
+
+    //订阅方法
+    public function subscribe($list)
     {
-        $action = "/prod-api/openapi/message/sendmessage";
+        $action = "/prod-api/openapi/express/subscriberecord/moredata";
         $appid = $this->appid;
         $appkey = $this->appkey;
         $body = array();
-        $body["smsType"] = $type;
-        $phoneList = array();
-        $phoneList[] = array("phone"=>$destnumbers,"content"=>$msg);
-        $body["phoneList"] = $phoneList;
-        $body["smsSendType"] = 0;
+        $body=$list;
         $url = $this->api_url . $action;
         $rs = $this->send_data($appid, $appkey, $body, $url);
         //解析出来返回数组
@@ -49,21 +49,41 @@ class Sms
             return $rt;
         }
         $rt['sta']="1";
-        $rt['msg']="发送成功！";
+        $rt['msg']="订阅成功！";
         return $rt;
     }
 	
-	
-    //获取短信条数方法
+
+
+    //接受推送方法
+    public  function get_track (){
+        //先验证签名保证消息未被篡改
+
+        //接受参数
+        $request = Request::instance();
+        $param = $request->param();
+        //接受参数
+        $sign = $param['sign'];
+        $testpra = $param['testpra'];
+        //自定义参数，用于区分平台客户
+        $receive_param = $param['param'];
+        get_tuisong_do_data($receive_param);
+        print_r($_REQUEST);die;
+
+
+
+    }
+
+
+    //获取剩余条数方法
     public function get_account_info()
     {
-        $action = "/prod-api/openapi/message/getyucount";
+        $action = "/prod-api/openapi/express/subscriberecord/getyucount";
         $appid = $this->appid;
         $appkey = $this->appkey;
         $body = array();
         $url = $this->api_url . $action;
         $rs = $this->send_data($appid, $appkey, $body, $url);
-
         //解析出来返回数组
         $arr=json_decode($rs,1);
         if($arr['code']!='200'){
@@ -78,7 +98,7 @@ class Sms
 	
 	
 	
-    
+     
     //具体发送方法
     public function send_data($appid, $appkey, $body, $url)
     {
@@ -142,5 +162,10 @@ class Sms
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         return $response;
-    }
+    }  
+
+
+
+
+
 }
