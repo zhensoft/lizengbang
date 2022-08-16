@@ -57,21 +57,16 @@ class Track
 
     //接受推送方法
     public  function get_track (){
-        //先验证签名保证消息未被篡改
-
         //接受参数
         $request = Request::instance();
         $param = $request->param();
-        //接受参数
-        $sign = $param['sign'];
-        $testpra = $param['testpra'];
-        //自定义参数，用于区分平台客户
-        $receive_param = $param['param'];
-        get_tuisong_do_data($receive_param);
-        print_r($_REQUEST);die;
-
-
-
+        //自己的url参数里面的get值也会接受
+        $content = file_get_contents("php://input"); //暂时没用到
+        $rt_arr=get_tuisong_do_data($param,$content);
+        if($rt_arr['sta']!='1'){
+            echo  '{ "msg":"接收成功,业务逻辑处理失败", "code": "0", "data": "接收成功,业务逻辑处理失败" }'; die;
+        }
+            echo  '{ "msg":"接收成功,处理业务成功", "code": "200", "data": "接收成功,处理业务成功" }'; die;
     }
 
 
