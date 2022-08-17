@@ -61,13 +61,16 @@ class Track
         $request = Request::instance();
         $param = $request->param();
         //自己的url参数里面的get值也会接受
-        $content = file_get_contents("php://input"); //暂时没用到
-        $rt_arr=get_tuisong_do_data($param,$content);
+        $param_content=json_encode($param, JSON_UNESCAPED_UNICODE); //这个接受到包含url的get值
+        $content = file_get_contents("php://input"); //后面这个接受到的是纯净数据
+        $rt_arr=get_tuisong_do_data($param_content,$content);
+        
         if($rt_arr['sta']!='1'){
             echo  '{ "msg":"接收成功,业务逻辑处理失败", "code": "0", "data": "接收成功,业务逻辑处理失败" }'; die;
         }
             echo  '{ "msg":"接收成功,处理业务成功", "code": "200", "data": "接收成功,处理业务成功" }'; die;
     }
+
 
 
     //获取剩余条数方法

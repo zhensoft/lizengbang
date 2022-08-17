@@ -32,5 +32,26 @@ $obj = new  Sms($api_url,$appid,$appkey);
 $rs=$obj->sendsms($destnumbers,$msg);
 print_r($rs);
 
+
+
+
+use lizengbang\Track;
+require "vendor/autoload.php";
+
+$appid = "10000010";
+$appkey = "w3f9116714b194c7fa696c6907b8d6910l"; //此秘钥只是示例，请使用正确秘钥
+$api_url = "http://lizengbang.waiwubang.com/";
+$obj = new  Track($api_url, $appid, $appkey);
+$clientkeynum="6666666";
+$call_back_url="http://".$_SERVER['HTTP_HOST']."/lizengbang_get_track?clientkeynum=".$clientkeynum;
+$list=array();
+$item[]=array("com"=>"shunfeng","num"=>"SF1698511072276","callBackUrl"=>$call_back_url);
+$item[]=array("com"=>"shunfeng","num"=>"SF1650078452758","callBackUrl"=>$call_back_url);
+$list=$item;
+$rs = $obj->subscribe($list);
+print_r($rs);
+
+
+
 ```
 
