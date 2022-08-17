@@ -16,21 +16,33 @@ use think\Db;
 
 
 //接受到 礼赠帮推送后的业务逻辑处理 ,注意需要拷贝到 自己项目的helper.php里面。
-function get_tuisong_do_data_copy($param = array(), $content = "")
+//接受到 礼赠帮推送后的业务逻辑处理
+function get_tuisong_do_data_copy($param_content = "", $content = "")
 {
-    $receive_param_arr = $param;
+    //数据样例
+    //$param_content='{"clientkeynum":"2429C9B29076DEBB2E3A155D13B7D096","com":"yunda","data":[{"context":"【揭阳市】已离开 广东揭阳分拨交付中心；发往 河北保定分拨交付中心","time":"2022-08-16 03:17:23"},{"context":"【揭阳市】已到达 广东揭阳分拨交付中心","time":"2022-08-16 03:15:40"},{"context":"【汕头市】已离开 广东汕头新两英公司；发往 河北保定分拨交付中心","time":"2022-08-15 22:18:29"},{"context":"【汕头市】广东汕头新两英公司-贝伟升（13145996200） 已揽收","time":"2022-08-15 22:13:12"}],"num":"462508923976475","state":"0","id":null}';  
+    //$content='{"com":"yunda","data":[{"context":"【揭阳市】已离开 广东揭阳分拨交付中心；发往 河北保定分拨交付中心","time":"2022-08-16 03:17:23"},{"context":"【揭阳市】已到达 广东揭阳分拨交付中心","time":"2022-08-16 03:15:40"},{"context":"【汕头市】已离开 广东汕头新两英公司；发往 河北保定分拨交付中心","time":"2022-08-15 22:18:29"},{"context":"【汕头市】广东汕头新两英公司-贝伟升（13145996200） 已揽收","time":"2022-08-15 22:13:12"}],"num":"462508923976475","state":"0"}';
+   
+
+    $receive_param_arr = json_decode($param_content,1);;
     //快递100主体信息
-    $state = $receive_param_arr['lastResult']['state'];
+    $state = $receive_param_arr['state'];
     //快递单当前状态，包括0在途，1揽收，2疑难，3签收，4退签，5派件，6退回，7转单，10待清关，11清关中，12已清关，13清关异常，14收件人拒签等13个状态
-    $lastResult = $receive_param_arr['lastResult']['data'];
+    $lastResult = $receive_param_arr['data'];
     //存入数据库里面保存
-    $kuaidi_code = $receive_param_arr['lastResult']['com'];
+    $kuaidi_code = $receive_param_arr['com'];
     //快递代码
-    $kuaidi_num = $receive_param_arr['lastResult']['num'];
+    $kuaidi_num = $receive_param_arr['num'];
     //快递单号
 
-
     $order_info = Db::table('client_order_info')->where("find_in_set( '$kuaidi_num', shipping_num )")->find();
+    //如果获取不到订单这里直接拦截报错
+     //返回成功 
+     if(empty($order_info)){
+        $rt['sta'] = "0";
+        $rt['msg'] = '未找到订单信息！';
+        return $rt;   
+     }
     $clientkeynum = $order_info['clientkeynum'];
 
     //更新物流轨迹表,存在更新，不存在则新增，里面是快递以及快递轨迹，一个订单可能有多个快递做兼容
@@ -69,8 +81,9 @@ function get_tuisong_do_data_copy($param = array(), $content = "")
     Db::table('plat_lizengbang_kuaidi_tuisong_log')->insert($tuisong_log);
 
     //如果是签收则需要把订单改为签收状态 if里面报错了，上面仍然是可以执行成功的！
+    $order_id = $order_info['order_id'];
+
     if ($state == '3') {
-        $order_id = $order_info['order_id'];
         //修改订单主表
         $up_arr['qianshou_time'] = time();
         $up_arr['order_status'] = 3;
@@ -88,6 +101,11 @@ function get_tuisong_do_data_copy($param = array(), $content = "")
             $log_flag = Db::table('client_order_log')->insert($log);
         }
     }
+
+     //更新订单表快递状态字段
+      //快递单当前状态，包括0在途，1揽收，2疑难，3签收，4退签，5派件，6退回，7转单，10待清关，11清关中，12已清关，13清关异常，14收件人拒签等13个状态
+     $up_kuaidi_state['kuaidi_status'] = $state;
+     Db::table('client_order_info')->where('order_id', $order_id)->update($up_kuaidi_state);
 
 
     //返回成功 
