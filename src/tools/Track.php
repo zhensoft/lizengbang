@@ -91,6 +91,7 @@ class Track
         }
         $rt['sta']="1";
         $rt['msg']="获取成功！";
+	    $rt['data']=$arr['data'];
         return $rt;
     }	
 	

@@ -73,6 +73,7 @@ class Sms
         }
         $rt['sta']="1";
         $rt['msg']="获取成功！";
+		$rt['riches']=$arr['data'];
         return $rt;
     }	
 	
