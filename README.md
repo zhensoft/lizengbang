@@ -52,6 +52,20 @@ $rs = $obj->subscribe($list);
 print_r($rs);
 
 
+use lizengbang\Shorturl;
+require "vendor/autoload.php";
+
+$change_type="0";
+$appid = "10000010";
+$appkey = "w3f9116714b194c7fa696c6907b8d6910l"; //此秘钥只是示例，请使用正确秘钥
+$api_url = "http://vplat.qiwubang.com/";
+$obj = new  Shorturl($api_url, $appid, $appkey);
+$rt_arr = $obj->get_short_url("http://www.baidu.com",$change_type);
+print_r($rt_arr);
+die;
+
+
+
 
 ```
 
