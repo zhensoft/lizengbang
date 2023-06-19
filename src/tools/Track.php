@@ -54,6 +54,33 @@ class Track
     }
 	
 
+    //主动查询接口
+    public function query_by_one($list)
+    {
+        $action = "/prod-api/openapi/express/subscriberecord/querybyonenew";
+        $appid = $this->appid;
+        $appkey = $this->appkey;
+        $body = array();
+        $body=$list;
+        $url = $this->api_url . $action;
+        $rs = $this->send_data($appid, $appkey, $body, $url);
+
+        //解析出来返回数组
+        $arr=json_decode($rs,1);
+        if($arr['code']!='200'){
+            $rt['sta']="0";
+            $rt['msg']=$arr['msg'];
+            return $rt;
+        }
+
+        $rt['sta']="1";
+        $rt['msg']="查询成功！";
+        $rt['msg']=$arr['data'];
+        return $rt;
+    }
+
+
+
 
     //接受推送方法
     public  function get_track (){
