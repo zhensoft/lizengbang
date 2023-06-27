@@ -9,6 +9,7 @@
 // | Author: wl < 613154514@qq.com >
 // +----------------------------------------------------------------------
 namespace lizengbang;
+
 use think\Request;
 
 class Track
@@ -38,21 +39,21 @@ class Track
         $appid = $this->appid;
         $appkey = $this->appkey;
         $body = array();
-        $body=$list;
+        $body = $list;
         $url = $this->api_url . $action;
         $rs = $this->send_data($appid, $appkey, $body, $url);
         //解析出来返回数组
-        $arr=json_decode($rs,1);
-        if($arr['code']!='200'){
-            $rt['sta']="0";
-            $rt['msg']=$arr['msg'];
+        $arr = json_decode($rs, 1);
+        if ($arr['code'] != '200') {
+            $rt['sta'] = "0";
+            $rt['msg'] = $arr['msg'];
             return $rt;
         }
-        $rt['sta']="1";
-        $rt['msg']="订阅成功！";
+        $rt['sta'] = "1";
+        $rt['msg'] = "订阅成功！";
         return $rt;
     }
-	
+
 
     //主动查询接口
     public function query_by_one($list)
@@ -61,21 +62,21 @@ class Track
         $appid = $this->appid;
         $appkey = $this->appkey;
         $body = array();
-        $body=$list;
+        $body = $list;
         $url = $this->api_url . $action;
         $rs = $this->send_data($appid, $appkey, $body, $url);
 
         //解析出来返回数组
-        $arr=json_decode($rs,1);
-        if($arr['code']!='200'){
-            $rt['sta']="0";
-            $rt['msg']=$arr['msg'];
+        $arr = json_decode($rs, 1);
+        if ($arr['code'] != '200') {
+            $rt['sta'] = "0";
+            $rt['msg'] = $arr['msg'];
             return $rt;
         }
 
-        $rt['sta']="1";
-        $rt['msg']="查询成功！";
-        $rt['msg']=$arr['data'];
+        $rt['sta'] = "1";
+        $rt['msg'] = "查询成功！";
+        $rt['msg'] = $arr['data'];
         return $rt;
     }
 
@@ -83,21 +84,31 @@ class Track
 
 
     //接受推送方法
-    public  function get_track (){
+    public  function get_track()
+    {
         //接受参数
         $request = Request::instance();
         $param = $request->param();
         //自己的url参数里面的get值也会接受
-        $param_content=json_encode($param, JSON_UNESCAPED_UNICODE); //这个接受到包含url的get值
+        $param_content = json_encode($param, JSON_UNESCAPED_UNICODE); //这个接受到包含url的get值
         $content = file_get_contents("php://input"); //后面这个接受到的是纯净数据
-        $rt_arr=get_tuisong_do_data($param_content,$content);
-        
-        if($rt_arr['sta']!='1'){
+        $rt_arr = get_tuisong_do_data($param_content, $content);
+
+        if ($rt_arr['sta'] != '1') {
             //日志记录函数需要再业务系统存在
-            logRes("param_content:".$param_content."   content:".$content."处理结果".json_encode($rt_arr, JSON_UNESCAPED_UNICODE),"lizengbang_tuisong_error");
-            echo  '{ "msg":"接收成功,业务逻辑处理失败", "code": "0", "data": "接收成功,业务逻辑处理失败" }'; die;
+            logRes("param_content:" . $param_content . "   content:" . $content . "处理结果" . json_encode($rt_arr, JSON_UNESCAPED_UNICODE), "lizengbang_tuisong_error");
+
+            $rt["code"] = "200";
+            $rt["msg"] = "接收成功,业务逻辑处理失败";
+            $rt["data"] = $rt_arr['msg'];
+            echo json_encode($rt, JSON_UNESCAPED_UNICODE);
+            die;
         }
-            echo  '{ "msg":"接收成功,处理业务成功", "code": "200", "data": "接收成功,处理业务成功" }'; die;
+        $rt["code"] = "200";
+        $rt["msg"] = "接收成功,处理业务成功";
+        $rt["data"] = $rt_arr['msg'];
+        echo json_encode($rt, JSON_UNESCAPED_UNICODE);
+        die;
     }
 
 
@@ -112,21 +123,21 @@ class Track
         $url = $this->api_url . $action;
         $rs = $this->send_data($appid, $appkey, $body, $url);
         //解析出来返回数组
-        $arr=json_decode($rs,1);
-        if($arr['code']!='200'){
-            $rt['sta']="0";
-            $rt['msg']=$arr['msg'];
+        $arr = json_decode($rs, 1);
+        if ($arr['code'] != '200') {
+            $rt['sta'] = "0";
+            $rt['msg'] = $arr['msg'];
             return $rt;
         }
-        $rt['sta']="1";
-        $rt['msg']="获取成功！";
-	    $rt['data']=$arr['data'];
+        $rt['sta'] = "1";
+        $rt['msg'] = "获取成功！";
+        $rt['data'] = $arr['data'];
         return $rt;
-    }	
-	
-	
-	
-     
+    }
+
+
+
+
     //具体发送方法
     public function send_data($appid, $appkey, $body, $url)
     {
@@ -164,8 +175,8 @@ class Track
         return $str;
     }
 
-    
-    
+
+
     /**
      * @param $url 发送post请求的url
      * @param $jsonStr 发送的数据
@@ -182,18 +193,13 @@ class Track
             $ch,
             CURLOPT_HTTPHEADER,
             array(
-            'Content-Type: application/json; charset=utf-8',
-            'Content-Length: ' . strlen($jsonStr)
-        )
+                'Content-Type: application/json; charset=utf-8',
+                'Content-Length: ' . strlen($jsonStr)
+            )
         );
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         return $response;
-    }  
-
-
-
-
-
+    }
 }
