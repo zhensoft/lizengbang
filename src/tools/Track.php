@@ -93,6 +93,8 @@ class Track
         $rt_arr=get_tuisong_do_data($param_content,$content);
         
         if($rt_arr['sta']!='1'){
+            //日志记录函数需要再业务系统存在
+            logRes("param_content:".$param_content."   content:".$content."处理结果".json_encode($rt_arr, JSON_UNESCAPED_UNICODE),"lizengbang_tuisong_error");
             echo  '{ "msg":"接收成功,业务逻辑处理失败", "code": "0", "data": "接收成功,业务逻辑处理失败" }'; die;
         }
             echo  '{ "msg":"接收成功,处理业务成功", "code": "200", "data": "接收成功,处理业务成功" }'; die;
