@@ -94,19 +94,27 @@ class Track
         $content = file_get_contents("php://input"); //后面这个接受到的是纯净数据
         $rt_arr = get_tuisong_do_data($param_content, $content);
 
+
         if ($rt_arr['sta'] != '1') {
-            //日志记录函数需要再业务系统存在
-            logRes("param_content:" . $param_content . "   content:" . $content . "处理结果" . json_encode($rt_arr, JSON_UNESCAPED_UNICODE), "lizengbang_tuisong_error");
 
             $rt["code"] = "200";
             $rt["msg"] = "接收成功,业务逻辑处理失败";
             $rt["data"] = $rt_arr['msg'];
+
+            //日志记录函数需要再业务系统存在
+            logRes("param_content:" . $param_content . "   content:" . $content . "处理结果" . json_encode($rt, JSON_UNESCAPED_UNICODE), "lizengbang_tuisong_error");
+
             echo json_encode($rt, JSON_UNESCAPED_UNICODE);
             die;
         }
+
         $rt["code"] = "200";
         $rt["msg"] = "接收成功,处理业务成功";
         $rt["data"] = $rt_arr['msg'];
+
+        //日志记录函数需要再业务系统存在
+        logRes("param_content:" . $param_content . "   content:" . $content . "处理结果" . json_encode($rt, JSON_UNESCAPED_UNICODE), "lizengbang_tuisong_success");
+       
         echo json_encode($rt, JSON_UNESCAPED_UNICODE);
         die;
     }
