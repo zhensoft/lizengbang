@@ -52,7 +52,34 @@ class Sms
         $rt['msg']="发送成功！";
         return $rt;
     }
+
 	
+    //发送短信方法v2
+    public function sendsms_v2($phone, $code, $reqCount = '1', $signKey = '')
+    {
+        $action = "/prod-api/openapi/message/sendCode";
+        $appid = $this->appid;
+        $appkey = $this->appkey;
+        $body = array();
+        $body = array("phone" => $phone, "code" => $code, "signKey" => $signKey, "reqCount" => $reqCount);
+        //参数字典序列wl@20250320
+        // 按字典序排序（键名升序）
+        ksort($body);
+
+        $url = $this->api_url . $action;
+        $rs = $this->send_data($appid, $appkey, $body, $url);
+        //解析出来返回数组
+        $arr = json_decode($rs, 1);
+        if ($arr['code'] != '200') {
+            $rt['sta'] = "0";
+            $rt['msg'] = $arr['msg'];
+            return $rt;
+        }
+        $rt['sta'] = "1";
+        $rt['msg'] = "发送成功v2！";
+        return $rt;
+    }
+
 	
     //获取短信条数方法
     public function get_account_info()
